@@ -1,20 +1,31 @@
-#include <M5Unified.h>
+//#include <M5Unified.h>
 #include <SPI.h>
 #include <Wire.h>
+//#include <Adafruit_NeoPixel.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <NeoPixelConnect.h>
+//#include <FastLED.h>
+
+// GPIO0: SDA
+// GPIO1: SCL
+// GPIO2: LED(WS2812)
+
+// using NeoPixel on rp2040connect
+// https://github.com/MrYsLab/NeoPixelConnect
+
+// using I2C
+// https://qiita.com/totuto/items/81944426dc81ab4b7e57
+MbedI2C myi2c(p0,p1); // I2C SDA:GP0, SCL:GP1 
+
+NeoPixelConnect p(2, 2); // GPIO2, 2 pixels
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
 
-// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
-// The pins for I2C are defined by the Wire-library. 
-// On an arduino UNO:       A4(SDA), A5(SCL)
-// On an arduino MEGA 2560: 20(SDA), 21(SCL)
-// On an arduino LEONARDO:   2(SDA),  3(SCL), ...
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &myi2c, OLED_RESET);
 
 #define NUMFLAKES     10 // Number of snowflakes in the animation example
 
@@ -38,7 +49,7 @@ static const unsigned char PROGMEM logo_bmp[] =
   0b01110000, 0b01110000,
   0b00000000, 0b00110000 };
 
-	void testdrawline() {
+void testdrawline() {
   int16_t i;
 
   display.clearDisplay(); // Clear display buffer
@@ -328,10 +339,16 @@ void testanimate(const uint8_t *bitmap, uint8_t w, uint8_t h) {
   }
 }
 
-void setup() {
-	M5.begin();
-	M5.begin(); Wire.end();
+/*
+void showLED(uint8_t i, uint8_t r, uint8_t g, uint8_t b) {
+	leds[i] = CRGB(r, g, b);
+	FastLED.show();
+}
+*/
 
+void setup() {
+//	M5.begin();
+//	M5.begin(); Wire.end();
   Serial.begin(9600);
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
@@ -396,4 +413,10 @@ void setup() {
 }
 
 void loop() {
+	p.neoPixelSetValue(0, 128, 0, 0, false); // disable auto show
+	p.neoPixelSetValue(0, 0, 128, 0, false);
+	p.neoPixelShow();
+	delay(500);
+	p.neoPixelClear();
+	delay(500);
 }
