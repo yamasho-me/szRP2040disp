@@ -8,6 +8,24 @@
 // GPIO1: SCL
 // GPIO2: LED(WS2812)
 
+/* for other boards:
+             LED    BTN
+   cui2      8(x4)
+   tanaka    -
+   ishii     -
+   yamasho   2
+   ogawa     2(x8)
+   kojima    2
+   kobayashi        4(U4)/2(U5)
+
+ */
+
+#define PIN_SDA  0
+#define PIN_SCL  1
+#define PIN_LED  2 // adjust to actual design
+#define PIN_BTN0 4 // adjust to actual design
+#define PIN_BTN1 2 // adjust to actual design
+
 #define PIN_LEDS 2
 #define PIN_BTN0 5 // adjust to actual design
 
@@ -20,7 +38,8 @@
 // using I2C on RP2040
 // https://qiita.com/totuto/items/81944426dc81ab4b7e57
 #define NUM_PIXELS 2 // 2 pixels
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN_LEDS, NEO_GRB + NEO_KHZ800);
+//Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN_LEDS, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel led = Adafruit_NeoPixel(NUM_PIXELS, PIN_LEDS, NEO_RGBW + NEO_KHZ800); // XL-5050RGBWC-WS2812B
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
@@ -36,8 +55,7 @@ void setup()
   pinMode(PIN_BTN0, INPUT_PULLUP);
 
   // I2C SDA:GP0, SCL:GP1
-  Wire.setSDA(0);
-  Wire.setSCL(1);
+  Wire.setSDA(PIN_SDA); Wire.setSCL(PIN_SCL);
   Wire.begin();
 
   if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
@@ -48,9 +66,9 @@ void setup()
   }
 
   // init leds
-  strip.begin();
-  strip.clear();
-  strip.show();
+  led.begin();
+  led.clear();
+  led.show();
 
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
@@ -91,30 +109,22 @@ void setup()
 
 void loop()
 {
-  // strip.Color(R, G, B)
-  strip.fill(strip.Color(5, 0, 0)); // show RED
-  strip.show();
+	led.setPixelColor(0, led.Color(5, 0, 0));
+	led.setPixelColor(1, led.Color(0, 0, 0));
+  led.show();
+  delay(500);
+	led.setPixelColor(0, led.Color(0, 0, 0));
+	led.setPixelColor(1, led.Color(0, 5, 0));
+  led.show();
+  delay(500);
+	led.fill(led.Color(0, 0, 5));
+	led.show();
   delay(500);
 
-  strip.fill(strip.Color(0, 5, 0)); // show GREEN
-  strip.show();
-
-  delay(500);
-
-  strip.fill(strip.Color(0, 0, 5)); // show BLUE
-  strip.show();
-
-  delay(500);
-
-  strip.clear(); // led off
-  // fill_solid(leds, NUM_PIXELS, CRGB::BLACK);
-  strip.show();
-  delay(500);
-
-  /*
+	/*
     // test for BTN
-    if (digitalRead(PIN_BTN0) == 0) p.neoPixelFill(0, 5, 0, true);
-    else p.neoPixelClear();
+    if (digitalRead(PIN_BTN0) == 0) led.fill(led.Color(5, 5, 5));
+    else  led.fill(led.Color(0, 0, 0));
     delay(100);
-  */
+*/
 }
