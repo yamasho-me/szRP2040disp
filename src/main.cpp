@@ -8,9 +8,12 @@
 // GPIO1: SCL
 // GPIO2: LED(WS2812)
 
+#define PIN_SDA  0
+#define PIN_SCL  1
+
 /* for other boards:
              LED    BTN
-   cui2      8(x4)
+   cui2      8(x4)  6(SW3)/7(SW4)
    tanaka    -
    ishii     -
    yamasho   2
@@ -20,26 +23,23 @@
 
  */
 
-#define PIN_SDA  0
-#define PIN_SCL  1
-#define PIN_LED  2 // adjust to actual design
-#define PIN_BTN0 4 // adjust to actual design
-#define PIN_BTN1 2 // adjust to actual design
+#define PIN_LED  8 // adjust to actual design
+#define PIN_BTN0 6 // adjust to actual design
+#define PIN_BTN1 7 // adjust to actual design
 
-#define PIN_LEDS 2
-#define PIN_BTN0 5 // adjust to actual design
-
+/*
 // RP2040connect
 // https://docs.platformio.org/en/stable/boards/raspberrypi/nanorp2040connect.html
-
 // using NeoPixel on rp2040connect
 // https://github.com/MrYsLab/NeoPixelConnect
-
 // using I2C on RP2040
 // https://qiita.com/totuto/items/81944426dc81ab4b7e57
-#define NUM_PIXELS 2 // 2 pixels
-//Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_PIXELS, PIN_LEDS, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel led = Adafruit_NeoPixel(NUM_PIXELS, PIN_LEDS, NEO_RGBW + NEO_KHZ800); // XL-5050RGBWC-WS2812B
+*/
+
+#define NUM_PIXELS 8 // number of pixels
+Adafruit_NeoPixel led = Adafruit_NeoPixel(NUM_PIXELS, PIN_LED, NEO_RGBW + NEO_KHZ800); // XL-5050RGBWC-WS2812B
+uint8_t led_r, led_g, led_b;
+#include "LED.inc"
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
@@ -107,9 +107,12 @@ void setup()
   */
 }
 
+uint16_t baseHue = 0;
+
 void loop()
 {
-	led.setPixelColor(0, led.Color(5, 0, 0));
+/*
+	ed.setPixelColor(0, led.Color(5, 0, 0));
 	led.setPixelColor(1, led.Color(0, 0, 0));
   led.show();
   delay(500);
@@ -120,11 +123,17 @@ void loop()
 	led.fill(led.Color(0, 0, 5));
 	led.show();
   delay(500);
-
-	/*
-    // test for BTN
-    if (digitalRead(PIN_BTN0) == 0) led.fill(led.Color(5, 5, 5));
-    else  led.fill(led.Color(0, 0, 0));
-    delay(100);
 */
+#define LED_BRIGHTNESS 10
+  for (unsigned int i = 0; i < NUM_PIXELS; i++)
+  {
+	  setColorHSV(map(i, 0, NUM_PIXELS, 0, 65535) + (unsigned int)baseHue, 250, LED_BRIGHTNESS);
+	  if (digitalRead(PIN_BTN0) == 1){ // if button NOT pressed
+    	led.setPixelColor(i, led.Color(led_r, led_g, led_b));
+		}
+  }
+	led.show();
+  delay(10);
+	baseHue += 0x100;
+
 }
