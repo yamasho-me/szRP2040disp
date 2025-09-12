@@ -23,9 +23,11 @@
 
  */
 
-#define PIN_LED  8 // adjust to actual design
-#define PIN_BTN0 6 // adjust to actual design
-#define PIN_BTN1 7 // adjust to actual design
+#define NO_LED
+
+#define PIN_LED  2 // adjust to actual design
+#define PIN_BTN0 2 // adjust to actual design
+#define PIN_BTN1 4 // adjust to actual design
 
 /*
 // RP2040connect
@@ -36,10 +38,12 @@
 // https://qiita.com/totuto/items/81944426dc81ab4b7e57
 */
 
+#ifndef NO_LED
 #define NUM_PIXELS 8 // number of pixels
 Adafruit_NeoPixel led = Adafruit_NeoPixel(NUM_PIXELS, PIN_LED, NEO_RGBW + NEO_KHZ800); // XL-5050RGBWC-WS2812B
 uint8_t led_r, led_g, led_b;
 #include "LED.inc"
+#endif
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
@@ -65,10 +69,12 @@ void setup()
       ;
   }
 
+#ifndef NO_LED
   // init leds
   led.begin();
   led.clear();
   led.show();
+#endif
 
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
@@ -112,7 +118,7 @@ uint16_t baseHue = 0;
 void loop()
 {
 /*
-	ed.setPixelColor(0, led.Color(5, 0, 0));
+	led.setPixelColor(0, led.Color(5, 0, 0));
 	led.setPixelColor(1, led.Color(0, 0, 0));
   led.show();
   delay(500);
@@ -124,6 +130,8 @@ void loop()
 	led.show();
   delay(500);
 */
+
+#ifndef NO_LED
 #define LED_BRIGHTNESS 10
   for (unsigned int i = 0; i < NUM_PIXELS; i++)
   {
@@ -135,5 +143,12 @@ void loop()
 	led.show();
   delay(10);
 	baseHue += 0x100;
-
+#endif
+	if (digitalRead(PIN_BTN0) == 0){ // if BTN0 pressed
+		display.invertDisplay(true);
+	}
+	else{
+		display.invertDisplay(false);
+	}
+	delay(100);
 }
