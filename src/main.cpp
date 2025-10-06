@@ -102,15 +102,15 @@ void setup()
     testfilltriangle();  // Draw triangles (filled)
     testdrawchar();      // Draw characters of the default font
     testdrawstyles();    // Draw 'stylized' characters
+    */
     testscrolltext();    // Draw scrolling text
-    testdrawbitmap();    // Draw a small bitmap image
+    //testdrawbitmap();    // Draw a small bitmap image
     // Invert and restore display, pausing in-between
     display.invertDisplay(true);
     delay(1000);
     display.invertDisplay(false);
   //  delay(1000);
   //  testanimate(logo_bmp, LOGO_WIDTH, LOGO_HEIGHT); // Animate bitmaps
-  */
 }
 
 uint16_t baseHue = 0;
